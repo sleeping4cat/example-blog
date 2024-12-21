@@ -6,12 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-    <link rel="shortcut icon" href="./favicon.ico" />
+    <link rel="icon" href="favicon.png" type="image/png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-javascript.min.js"></script>
 
     <style>
         body {
@@ -99,7 +101,7 @@
 <body class="container">
     <div class="row">
         <div class="col-1 side-nav-div">
-            <button onclick="window.location.replace('https://sleeping4cat.github.io/sleepingcat/')" class="side-nav fixed-size"><span class="fa fa-home"></span></button>
+            <button onclick="window.location.replace('https://example.com')" class="side-nav fixed-size"><span class="fa fa-home"></span></button>
             <button onclick="increaseFontSize()" class="side-nav fixed-size">A+</button>
             <button onclick="decreaseFontSize()" class="side-nav fixed-size">A-</button>
         </div>
@@ -111,16 +113,8 @@
         const isDarkModeEnabled = false;
 
         async function loadMarkdown() {
-            const filesResponse = await fetch('posts.yaml');
-            if (!filesResponse.ok) {
-                document.querySelector('article').innerHTML = "<p>Error loading files list.</p>";
-                return;
-            }
-
-            const yamlText = await filesResponse.text();
-            const filesData = jsyaml.load(yamlText);
-            const articleName = filesData.articles[0];  // Load the first file from the list
-            const articlePath = articleName;
+            const articleName = window.location.pathname.split('/').pop().replace('.html', '.md');
+            const articlePath = articleName; // Dynamically get the article name
 
             console.log("Article path:", articlePath);
 
@@ -129,6 +123,7 @@
                 document.querySelector('article').innerHTML = "<p>Error loading blog content.</p>";
                 return;
             }
+
             const markdown = await response.text();
             const htmlContent = marked.parse(markdown);
             document.querySelector('article').innerHTML = htmlContent;
@@ -139,6 +134,8 @@
                     { left: "$", right: "$", display: false }
                 ]
             });
+
+            Prism.highlightAll();
         }
 
         function increaseFontSize() {

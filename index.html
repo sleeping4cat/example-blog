@@ -99,7 +99,7 @@
 <body class="container">
     <div class="row">
         <div class="col-1 side-nav-div">
-            <button onclick="window.location.replace('https://example.com')" class="side-nav fixed-size"><span class="fa fa-home"></span></button>
+            <button onclick="window.location.replace('https://sleeping4cat.github.io/sleepingcat/')" class="side-nav fixed-size"><span class="fa fa-home"></span></button>
             <button onclick="increaseFontSize()" class="side-nav fixed-size">A+</button>
             <button onclick="decreaseFontSize()" class="side-nav fixed-size">A-</button>
         </div>
@@ -111,7 +111,7 @@
         const isDarkModeEnabled = false;
 
         async function loadMarkdown() {
-            const filesResponse = await fetch('files.yaml');
+            const filesResponse = await fetch('posts.yaml');
             if (!filesResponse.ok) {
                 document.querySelector('article').innerHTML = "<p>Error loading files list.</p>";
                 return;

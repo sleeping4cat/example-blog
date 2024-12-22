@@ -11,9 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-markup.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 
     <style>
         body {
@@ -113,8 +111,17 @@
         const isDarkModeEnabled = false;
 
         async function loadMarkdown() {
-            const articleName = window.location.pathname.split('/').pop().replace('.html', '.md');
-            const articlePath = articleName; 
+            const filesResponse = await fetch('posts.yaml');
+            if (!filesResponse.ok) {
+                document.querySelector('article').innerHTML = "<p>Error loading posts list.</p>";
+                return;
+            }
+
+            const yamlText = await filesResponse.text();
+            const filesData = jsyaml.load(yamlText);
+
+            const articleName = window.location.pathname.split('/').pop().replace('.html', '.md');  // Extract file name from URL
+            const articlePath = filesData.articles[articleName] || articleName; // Look up in YAML or use file directly
 
             console.log("Article path:", articlePath);
 
@@ -134,8 +141,6 @@
                     { left: "$", right: "$", display: false }
                 ]
             });
-
-            Prism.highlightAll();
         }
 
         function increaseFontSize() {

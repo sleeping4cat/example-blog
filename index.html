@@ -5,11 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" href="favicon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link rel="icon" href="favicon.png" type="space_invader.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
     <style>
         body {
             font-family: Georgia, 'Times New Roman', Times, serif;
@@ -53,6 +56,38 @@
         html {
             font-size: 1.3rem;
         }
+        blockquote {
+            background: #f9f9f9;
+            border-left: 10px solid #ccc;
+            margin: 1.5em 10px;
+            padding: 0.5em 10px;
+            quotes: "\201C""\201D""\2018""\2019";
+        }
+        blockquote:before {
+            color: #ccc;
+            content: open-quote;
+            font-size: 4em;
+            line-height: 0.1em;
+            margin-right: 0.25em;
+            vertical-align: -0.4em;
+        }
+        blockquote p {
+            display: inline;
+        }
+        @media (max-width:1000px) {
+            .row {
+                flex-direction: column;
+            }
+            .col-1 {
+                width: 100%;
+                margin-top: 10px;
+                float: left;
+            }
+            .col-11 {
+                margin-top: 4px !important;
+                width: 100%;
+            }
+        }
         body.dark-mode .katex {
             color: white !important;
         }
@@ -71,24 +106,26 @@
         <article class="col-11 mt-5"></article>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
     <script>
+        const isDarkModeEnabled = false;
+
         async function loadMarkdown() {
-            const params = new URLSearchParams(window.location.search);
-            const article = params.get('article');
-            
-            if (!article) {
-                document.querySelector('article').innerHTML = "<p>Error: No article specified.</p>";
-                return;
+            const fileNames = ['blog.md', 'coding.md'];  // Hardcoded filenames
+            let combinedContent = "";
+
+            for (const fileName of fileNames) {
+                const response = await fetch(fileName);
+                if (!response.ok) {
+                    document.querySelector('article').innerHTML = `<p>Error loading ${fileName}.</p>`;
+                    return;
+                }
+                const markdown = await response.text();
+                const htmlContent = marked.parse(markdown);
+                combinedContent += htmlContent;  // Concatenate the content
             }
 
-            const response = await fetch(article);
-            if (!response.ok) {
-                document.querySelector('article').innerHTML = "<p>Error loading article content.</p>";
-                return;
-            }
-            const markdown = await response.text();
-            const htmlContent = marked.parse(markdown);
-            document.querySelector('article').innerHTML = htmlContent;
+            document.querySelector('article').innerHTML = combinedContent;
 
             renderMathInElement(document.querySelector('article'), {
                 delimiters: [
@@ -110,7 +147,38 @@
             if (currentFont > 14) html.style.fontSize = (currentFont - 3) + "px";
         }
 
-        window.addEventListener('load', loadMarkdown);
+        function addDarkmodeWidget() {
+            if (!isDarkModeEnabled) return;
+
+            const options = {
+                time: '0.5s',
+                mixColor: '#fff',
+                backgroundColor: '#fff',
+                buttonColorDark: '#100f2c',
+                buttonColorLight: '#fff',
+                saveInCookies: false,
+                label: '🌙',
+                autoMatchOsTheme: true
+            };
+            const darkmode = new Darkmode(options);
+            darkmode.showWidget();
+
+            function toggleDarkMode() {
+                if (darkmode.isActivated()) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+
+            toggleDarkMode();
+            window.addEventListener('darkmode-change', toggleDarkMode);
+        }
+
+        window.addEventListener('load', () => {
+            addDarkmodeWidget();
+            loadMarkdown();
+        });
     </script>
 </body>
 </html>

@@ -121,9 +121,9 @@
             const filesData = jsyaml.load(yamlText);
 
             let articleLinks = '';
-            filesData.articles.forEach((article, index) => {
-                articleLinks += `<li><a href="article.html?article=${article}">${article}</a></li>`;
-            });
+            for (const [title, filename] of Object.entries(filesData.articles)) {
+                articleLinks += `<li><a href="article.html?article=${filename}">${title}</a></li>`;
+            }
 
             document.querySelector('article').innerHTML = `
                 <h1>Articles</h1>

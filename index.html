@@ -94,6 +94,16 @@
         body .katex {
             color: black;
         }
+        hr {
+            border-top: 1px solid #ccc;
+            margin-top: 2em;
+            margin-bottom: 2em;
+        }
+        h2.article-label {
+            font-size: 0.8rem;
+            color: #2563EB;
+            font-weight: normal;
+        }
     </style>
 </head>
 <body class="container">
@@ -113,6 +123,7 @@
         async function loadMarkdown() {
             const fileNames = ['blog.md', 'coding.md'];  // Hardcoded filenames
             let combinedContent = "";
+            let articleCounter = 1;
 
             for (const fileName of fileNames) {
                 const response = await fetch(fileName);
@@ -122,8 +133,19 @@
                 }
                 const markdown = await response.text();
                 const htmlContent = marked.parse(markdown);
-                combinedContent += htmlContent;  // Concatenate the content
+
+                // Add article label (A1, A2, etc.)
+                combinedContent += `<h2 class="article-label">Article ${articleCounter}</h2>`;
+                combinedContent += htmlContent;  // Article content
+
+                // Add horizontal line between articles
+                combinedContent += "<hr>";
+
+                articleCounter++;
             }
+
+            // Remove last horizontal line
+            combinedContent = combinedContent.replace(/<hr>$/, '');
 
             document.querySelector('article').innerHTML = combinedContent;
 

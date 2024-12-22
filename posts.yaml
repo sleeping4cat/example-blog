@@ -1,3 +1,4 @@
 articles:
-  - blog.md
-  - coding.md
+  blog: "blog.md"
+  coding: "coding.md"
+  another: "another_article.md"
